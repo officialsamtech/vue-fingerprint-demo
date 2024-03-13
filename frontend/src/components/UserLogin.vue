@@ -28,9 +28,9 @@ const login = () => {
     })
     .then((response) => {
       localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user)); // Assuming the backend sends the user object
+      localStorage.setItem("user", JSON.stringify(response.data.user));
       router.push("/");
-      toastr.success(response.data.message);
+      toastr.success("Logged in succesfully");
       email.value = "";
       password.value = "";
     })

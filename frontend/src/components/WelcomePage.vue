@@ -1,40 +1,32 @@
 <template>
   <div class="home-container">
-    <h1>Welcome, {{ username }}</h1>
-    <button @click="logout">Logout</button>
+    <h1>Welcome to the Application</h1>
+    <button @click="getData({ ignoreCache: true })">Identify Device</button>
+    <div v-if="isLoading">Loading...</div>
+    <div v-else-if="error">Error: {{ error.message }}</div>
+    <div v-else>
+      <p>Visitor ID: {{ data?.visitorId }}</p>
+      <pre>{{ JSON.stringify(data, null, 2) }}</pre>
+    </div>
   </div>
 </template>
   
   <script setup>
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-vue-v3";
 
-const username = ref("");
-const router = useRouter();
-
-onMounted(() => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (!user) {
-    router.push("/login");
-  } else {
-    username.value = user.username;
-  }
-});
-
-const logout = () => {
-  localStorage.removeItem("user");
-  router.push("/login");
-};
+const { data, error, isLoading, getData } = useVisitorData(
+  { extendedResult: true },
+  { immediate: false }
+);
 </script>
 
   <style scoped>
 .home-container {
   text-align: center;
-  margin-top: 50px;
-}
-
-button {
   margin-top: 20px;
+}
+button {
+  margin: 20px 0;
   padding: 10px 20px;
   background-color: #34568b;
   color: white;
@@ -42,7 +34,6 @@ button {
   border-radius: 4px;
   cursor: pointer;
 }
-
 button:hover {
   background-color: #274257;
 }

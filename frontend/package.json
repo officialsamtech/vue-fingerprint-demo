@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^4.2.2",
+    "@fingerprintjs/fingerprintjs-pro-vue-v3": "^1.4.0",
     "axios": "^1.6.7",
     "core-js": "^3.8.3",
     "toastr": "^2.1.4",
