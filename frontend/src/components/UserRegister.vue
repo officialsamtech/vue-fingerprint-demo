@@ -52,7 +52,6 @@ const register = async () => {
     })
     .then((response) => {
       toastr.success("Registration successful");
-      console.log("response", response);
       router.push("/login");
     })
     .catch((error) => {
