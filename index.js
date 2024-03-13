@@ -5,6 +5,8 @@ const cors = require('cors');
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { FingerprintJsServerApiClient, Region } = require('@fingerprintjs/fingerprintjs-pro-server-api');
+
 
 
 const app = express();
@@ -17,12 +19,47 @@ const pool = new Pool({
 app.use(cors());
 app.use(bodyParser.json());
 
+const client = new FingerprintJsServerApiClient({
+    apiKey: process.env.SECRET_API_KEY,
+    region: Region.Global, // Adjust based on your account's region
+});
+
 // Registration endpoint
 app.post('/register', async (req, res) => {
-    const { email, password, fingerprint, username } = req.body;
+    const { email, password, username, visitorId, requestId } = req.body;
+
     try {
+        // Perform server-side validation using the FingerprintJS Pro Server API
+        const event = await client.getEvent(requestId);
+        console.log('Event:', event.products.identification.data);
+
+        const identificationData = event.products.identification.data;
+        const serverVisitorId = identificationData.visitorId;
+        const confidence = identificationData.confidence.score;
+
+        // Check if the visitorId matches
+        if (serverVisitorId !== visitorId) {
+            return res.status(400).json({ message: 'Forged visitor ID' });
+        }
+
+        const now = Date.now() / 1000;
+        const identifiedAt = event.timestamp / 1000;
+        const diff = now - identifiedAt;
+        const maxRequestLifespan = 60; // seconds
+        const minimumConfidenceScore = 0.9;
+
+        // Check the request's validity based on its age
+        if (diff > maxRequestLifespan) {
+            return res.status(400).json({ message: 'Forged request ID' });
+        }
+
+        // Check if the confidence score meets the minimum threshold
+        if (confidence <= minimumConfidenceScore) {
+            return res.status(400).json({ message: 'Not confident' });
+        }
+
         // Check if fingerprint exists
-        const fingerprintCheck = await pool.query('SELECT * FROM users WHERE fingerprint = $1', [fingerprint]);
+        const fingerprintCheck = await pool.query('SELECT * FROM users WHERE fingerprint = $1', [visitorId]);
         if (fingerprintCheck.rows.length > 0) {
             return res.status(400).json({ message: 'Device already registered.' });
         }
@@ -30,22 +67,14 @@ app.post('/register', async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-
-        console.log('Inserting user:', { username, email, password: 'hidden', fingerprint });
-
         // Insert user into database
-        await pool.query(
-            'INSERT INTO users (username, email, password, fingerprint) VALUES ($1, $2, $3, $4)',
-            [username, email, hashedPassword, fingerprint]
-        );
-
+        await pool.query('INSERT INTO users (username, email, password, fingerprint) VALUES ($1, $2, $3, $4)', [username, email, hashedPassword, visitorId]);
         res.status(201).json({ message: 'User registered successfully.' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: error.message || 'Server error' });
+        res.status(500).json({ message: 'Server error' });
     }
 });
-
 
 // Login endpoint
 app.post('/login', async (req, res) => {
