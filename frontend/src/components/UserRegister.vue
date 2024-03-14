@@ -15,40 +15,19 @@ import axios from "axios";
 import { useRouter } from "vue-router";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
-import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-vue-v3";
 
 const email = ref("");
 const password = ref("");
 const username = ref("");
 const router = useRouter();
 
-// Initialize the hook to get visitor data
-const { data, error, getData } = useVisitorData();
-
 const register = async () => {
-  // Call getVisitorData to retrieve the VisitorID
-  await getData();
-
-  // Check if there's an error while getting the VisitorID
-  if (error.value) {
-    toastr.error(error.value.message);
-    return;
-  }
-
-  // Check if the VisitorID data is available
-  if (!data.value || !data.value.visitorId) {
-    toastr.error("Could not retrieve the device identifier.");
-    return;
-  }
-
-  // Now you have the VisitorID, you can send it to your backend
+  // Send user registration data to your backend
   axios
     .post("http://localhost:3000/register", {
       email: email.value,
       password: password.value,
       username: username.value,
-      visitorId: data.value.visitorId, // Send the VisitorID instead of the fingerprint
-      requestId: data.value.requestId,
     })
     .then(() => {
       toastr.success("Registration successful");
