@@ -50,7 +50,7 @@ const register = async () => {
       visitorId: data.value.visitorId, // Send the VisitorID instead of the fingerprint
       requestId: data.value.requestId,
     })
-    .then((response) => {
+    .then(() => {
       toastr.success("Registration successful");
       router.push("/login");
     })
