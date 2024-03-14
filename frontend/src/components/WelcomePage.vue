@@ -1,23 +1,10 @@
 <template>
   <div class="home-container">
     <h1>Welcome to the Application</h1>
-    <button @click="getData({ ignoreCache: true })">Identify Device</button>
-    <div v-if="isLoading">Loading...</div>
-    <div v-else-if="error">Error: {{ error.message }}</div>
-    <div v-else>
-      <p>Visitor ID: {{ data?.visitorId }}</p>
-      <pre>{{ JSON.stringify(data, null, 2) }}</pre>
-    </div>
   </div>
 </template>
   
   <script setup>
-import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-vue-v3";
-
-const { data, error, isLoading, getData } = useVisitorData(
-  { extendedResult: true },
-  { immediate: false }
-);
 </script>
 
   <style scoped>
