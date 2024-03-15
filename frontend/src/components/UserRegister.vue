@@ -4,13 +4,14 @@
     <input v-model="username" placeholder="Username" type="text" />
     <input v-model="email" placeholder="Email" type="email" />
     <input v-model="password" placeholder="Password" type="password" />
+    <input v-model="visitorId" type="hidden" />
     <button @click="register">Register</button>
     <p>Already have an account? <router-link to="/login">Login</router-link></p>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 import toastr from "toastr";
@@ -25,47 +26,44 @@ const router = useRouter();
 // Initialize the hook to get visitor data
 const { data, error, getData } = useVisitorData();
 
-const register = async () => {
-  // Call getVisitorData to retrieve the VisitorID
-  await getData();
+// Call getData to retrieve the VisitorID and requestId
+getData();
 
+// Watch for changes in the data object
+watch(data, async (newData) => {
   // Check if there's an error while getting the VisitorID
   if (error.value) {
     toastr.error(error.value.message);
     return;
   }
 
-  // Check if the VisitorID data is available
-  if (!data.value || !data.value.visitorId) {
-    toastr.error("Could not retrieve the device identifier.");
+  // Check if the VisitorID and requestId data are available
+  if (!newData.value || !newData.value.visitorId || !newData.value.requestId) {
     return;
   }
 
-  // Now you have the VisitorID, you can send it to your backend
-  axios
-    .post("http://localhost:3000/register", {
-      email: email.value,
-      password: password.value,
-      username: username.value,
-      visitorId: data.value.visitorId, // Send the VisitorID instead of the fingerprint
-      requestId: data.value.requestId,
-    })
-    .then(() => {
-      toastr.success("Registration successful");
-      router.push("/login");
-    })
-    .catch((error) => {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        toastr.error(error.response.data.message); // Display error message from backend
-      } else {
-        toastr.error("Registration failed due to an unexpected error.");
-      }
-    });
-};
+  // Prepare the request payload
+  const requestPayload = {
+    email: email.value,
+    password: password.value,
+    username: username.value,
+    visitorId: newData.value.visitorId,
+    requestId: newData.value.requestId,
+  };
+
+  // Send the registration request to the backend
+  try {
+    await axios.post("http://localhost:3000/register", requestPayload);
+    toastr.success("Registration successful");
+    router.push("/");
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.message) {
+      toastr.error(error.response.data.message); // Display error message from backend
+    } else {
+      toastr.error("Registration failed due to an unexpected error.");
+    }
+  }
+});
 </script>
 
 <style scoped>
