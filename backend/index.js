@@ -34,7 +34,9 @@ app.post('/register', async (req, res) => {
 
         // Insert new user into database
         await pool.query('INSERT INTO users (username, email, password) VALUES ($1, $2, $3)', [username, email, hashedPassword]);
-        res.status(201).json({ message: 'User registered successfully.' });
+
+        // Return success message and username
+        res.status(201).json({ message: 'User registered successfully.', username: username });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });

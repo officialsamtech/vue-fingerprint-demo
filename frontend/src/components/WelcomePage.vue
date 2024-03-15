@@ -1,14 +1,34 @@
 <template>
   <div class="home-container">
-    <h1>Welcome to the Application</h1>
+    <h1>Welcome {{ username }}</h1>
     <div class="home-links">
-      <router-link to="/register"> Register </router-link>
-      <router-link to="/login"> Login </router-link>
+      <div v-if="!username">
+        <router-link to="/register"> Register </router-link>
+      </div>
     </div>
   </div>
 </template>
   
-  <script setup>
+<script>
+import { ref, onMounted } from "vue";
+
+export default {
+  setup() {
+    const username = ref("");
+
+    onMounted(() => {
+      // Check if username exists in localStorage
+      const storedUsername = localStorage.getItem("user");
+      if (storedUsername) {
+        username.value = storedUsername;
+      }
+    });
+
+    return {
+      username,
+    };
+  },
+};
 </script>
 
   <style scoped>
