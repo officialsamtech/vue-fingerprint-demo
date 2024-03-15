@@ -1,6 +1,10 @@
 <template>
   <div class="home-container">
     <h1>Welcome to the Application</h1>
+    <div class="home-links">
+      <router-link to="/register"> Register </router-link>
+      <router-link to="/login"> Login </router-link>
+    </div>
   </div>
 </template>
   
@@ -21,8 +25,15 @@ button {
   border-radius: 4px;
   cursor: pointer;
 }
+
 button:hover {
   background-color: #274257;
+}
+
+.home-links {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
 }
 </style>
   
