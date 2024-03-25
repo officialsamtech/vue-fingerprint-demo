@@ -14,17 +14,32 @@ import axios from "axios";
 import { useRouter } from "vue-router";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
+import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-vue-v3";
 
 const router = useRouter();
 
 const email = ref("");
 const password = ref("");
+const { data, error, getData } = useVisitorData();
 
-const login = () => {
+const login = async () => {
+  await getData();
+
+  if (error.value) {
+    toastr.error(error.value.message);
+    return;
+  }
+
+  if (!data.value || !data.value.visitorId) {
+    toastr.error("Could not retrieve the device identifier.");
+    return;
+  }
+
   axios
     .post("http://localhost:3000/login", {
       email: email.value,
       password: password.value,
+      visitorId: data.value.visitorId,
     })
     .then((response) => {
       localStorage.setItem("token", response.data.token);

@@ -46,7 +46,7 @@ app.post('/register', async (req, res) => {
         const identifiedAt = event.timestamp / 1000;
         const diff = now - identifiedAt;
         const maxRequestLifespan = 60; // seconds
-        const minimumConfidenceScore = 0.9;
+        const minimumConfidenceScore = 0.6;
 
         // Check the request's validity based on its age
         if (diff > maxRequestLifespan) {
@@ -59,9 +59,9 @@ app.post('/register', async (req, res) => {
         }
 
         // Check if fingerprint exists
-        const fingerprintCheck = await pool.query('SELECT * FROM users WHERE fingerprint = $1', [visitorId]);
+        const fingerprintCheck = await pool.query('SELECT * FROM users WHERE fingerprint = $1 AND email != $2', [visitorId, email]);
         if (fingerprintCheck.rows.length > 0) {
-            return res.status(400).json({ message: 'Device already registered.' });
+            return res.status(400).json({ message: 'Device already registered with another account.' });
         }
 
         // Hash password
@@ -78,12 +78,18 @@ app.post('/register', async (req, res) => {
 
 // Login endpoint
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, visitorId } = req.body;
     try {
         // Check if user exists
         const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
         if (user.rows.length === 0) {
             return res.status(400).json({ message: 'User not found.' });
+        }
+
+        console.log('user', user.rows)
+        // Check if the visitorId matches the stored fingerprint
+        if (user.rows[0].fingerprint !== visitorId) {
+            return res.status(400).json({ message: 'Unregistered device' });
         }
 
         // Verify password

@@ -48,7 +48,7 @@ const register = async () => {
       toastr.success("Registration successful");
       router.push("/login");
       localStorage.setItem("user", response.data.username);
-      router.push("/");
+      router.push("/login");
     })
     .catch((error) => {
       if (
