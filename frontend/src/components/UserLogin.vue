@@ -40,6 +40,7 @@ const login = async () => {
       email: email.value,
       password: password.value,
       visitorId: data.value.visitorId,
+      requestId: data.value.requestId,
     })
     .then((response) => {
       localStorage.setItem("token", response.data.token);

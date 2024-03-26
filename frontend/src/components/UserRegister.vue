@@ -42,7 +42,6 @@ const register = async () => {
       password: password.value,
       username: username.value,
       visitorId: data.value.visitorId,
-      requestId: data.value.requestId,
     })
     .then((response) => {
       toastr.success("Registration successful");
