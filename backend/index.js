@@ -35,6 +35,11 @@ app.post('/register', async (req, res) => {
             return res.status(400).json({ message: 'Email already registered' });
         }
 
+        const fingerprintCheck = await pool.query('SELECT * FROM users WHERE fingerprint = $1', [visitorId]);
+        if (fingerprintCheck.rows.length > 0) {
+            return res.status(400).json({ message: 'This device is already registered with another account. If this is your account, please log in.' });
+        }
+
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
