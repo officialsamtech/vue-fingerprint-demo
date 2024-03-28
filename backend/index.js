@@ -88,7 +88,7 @@ app.post('/login', async (req, res) => {
 
         // Check if the visitorId matches the stored fingerprint
         if (serverVisitorId !== visitorId || user.fingerprint !== visitorId) {
-            return res.status(400).json({ message: 'Unregistered device.' });
+            return res.status(400).json({ message: 'New Browser Detected' });
         }
 
         // Verify password
