@@ -35,15 +35,10 @@ const register = async () => {
       router.push("/");
     })
     .catch((error) => {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        toastr.error(error.response.data.message); // Display error message from backend
-      } else {
-        toastr.error("Registration failed due to an unexpected error.");
-      }
+      toastr.error(
+        error.response?.data?.message ||
+          "Registration failed due to an unexpected error."
+      );
     });
 };
 </script>
