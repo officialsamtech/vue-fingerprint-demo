@@ -50,22 +50,22 @@ app.post('/login', async (req, res) => {
 
     try {
         // Retrieve user from database
-        const userQueryResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (userQueryResult.rows.length === 0) {
+        const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (user.rows.length === 0) {
             return res.status(400).json({ message: 'User not found.' });
         }
 
         // Verify password
-        const validPassword = await bcrypt.compare(password, userQueryResult.rows[0].password);
+        const validPassword = await bcrypt.compare(password, user.rows[0].password);
         if (!validPassword) {
             return res.status(400).json({ message: 'Invalid password.' });
         }
 
         // Generate JWT
-        const token = jwt.sign({ id: userQueryResult.rows[0].id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.rows[0].id }, process.env.SECRET_KEY, { expiresIn: '1h' });
 
         // Respond with token and user information
-        res.json({ token, user: { username: userQueryResult.rows[0].username } });
+        res.json({ token, user: { username: user.rows[0].username } });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
