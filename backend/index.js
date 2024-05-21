@@ -46,7 +46,7 @@ app.post('/register', async (req, res) => {
 
         // Insert user into database with the fingerprint
         await pool.query('INSERT INTO users (username, email, password, fingerprint) VALUES ($1, $2, $3, $4)', [username, email, hashedPassword, visitorId]);
-        res.status(201).json({ message: 'User registered successfully.' });
+        res.status(201).json({ message: 'User registered successfully.', username: username });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
