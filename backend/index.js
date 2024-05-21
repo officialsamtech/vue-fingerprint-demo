@@ -23,11 +23,12 @@ app.post('/register', async (req, res) => {
     const { email, password, username } = req.body;
 
     try {
-        // Check if user already exists
-        const userExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (userExists.rows.length > 0) {
-            return res.status(400).json({ message: 'Email already registered.' });
+        // Check if the email is already registered
+        const emailCheck = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (emailCheck.rows.length > 0) {
+            return res.status(400).json({ message: 'Email already registered' });
         }
+
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
