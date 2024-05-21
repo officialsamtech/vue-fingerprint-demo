@@ -59,11 +59,11 @@ app.post('/login', async (req, res) => {
 
     try {
         // Check if user exists
-        const userQueryResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (userQueryResult.rows.length === 0) {
+        const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (user.rows.length === 0) {
             return res.status(400).json({ message: 'User not found.' });
         }
-        const user = userQueryResult.rows[0];
+
 
         // Perform server-side validation using the FingerprintJS Pro Server API
         const event = await client.getEvent(requestId);
@@ -80,7 +80,6 @@ app.post('/login', async (req, res) => {
         if (diff > maxRequestLifespan) {
             return res.status(400).json({ message: 'Expired request ID.' });
         }
-        console.log({ confidence })
 
         // Check if the confidence score meets the minimum threshold
         if (confidence < minimumConfidenceScore) {
