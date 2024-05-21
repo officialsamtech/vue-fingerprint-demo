@@ -7,6 +7,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { FingerprintJsServerApiClient, Region } = require('@fingerprintjs/fingerprintjs-pro-server-api');
 
+const client = new FingerprintJsServerApiClient({
+    apiKey: process.env.SECRET_API_KEY,
+    region: Region.Global, // Adjust based on your account's region
+});
 
 
 const app = express();
@@ -19,10 +23,7 @@ const pool = new Pool({
 app.use(cors());
 app.use(bodyParser.json());
 
-const client = new FingerprintJsServerApiClient({
-    apiKey: process.env.SECRET_API_KEY,
-    region: Region.Global, // Adjust based on your account's region
-});
+
 
 // Registration endpoint
 app.post('/register', async (req, res) => {
