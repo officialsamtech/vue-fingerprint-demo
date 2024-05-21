@@ -80,6 +80,7 @@ app.post('/login', async (req, res) => {
         if (diff > maxRequestLifespan) {
             return res.status(400).json({ message: 'Expired request ID.' });
         }
+        console.log({ confidence })
 
         // Check if the confidence score meets the minimum threshold
         if (confidence < minimumConfidenceScore) {
