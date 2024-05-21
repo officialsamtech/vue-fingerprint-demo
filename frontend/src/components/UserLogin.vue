@@ -51,15 +51,10 @@ const login = async () => {
       password.value = "";
     })
     .catch((error) => {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        toastr.error(error.response.data.message); // Display error message from backend
-      } else {
-        toastr.error("Login failed due to an unexpected error.");
-      }
+      toastr.error(
+        error.response?.data?.message ||
+          "Login failed due to an unexpected error."
+      );
     });
 };
 </script>
