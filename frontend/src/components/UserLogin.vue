@@ -35,6 +35,8 @@ const login = async () => {
     return;
   }
 
+  console.log("vis id", data.value.visitorId);
+
   axios
     .post("http://localhost:3000/login", {
       email: email.value,

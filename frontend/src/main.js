@@ -8,6 +8,6 @@ const app = createApp(App);
 app.use(router);
 app.use(fpjsPlugin, {
     loadOptions: {
-        apiKey: "ku2mYGIIWMIwbxtxaqRp",
+        apiKey: "hIgDB3mvfpvp5HsYIVy3",
     },
 }).mount('#app');
